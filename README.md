@@ -1,21 +1,43 @@
 <div align="center">
 
-<img src="assets/hero.svg" width="100%" alt="RAJ — Full-stack developer · Automation · Linux — BCA @ Tilak Maharashtra Vidyapeeth" />
+<picture>
+  <source media="(max-width: 700px)" srcset="assets/hero-m.svg" />
+  <img src="assets/hero.svg" width="100%" alt="RAJ — Full-stack developer · Automation · Linux — BCA @ Tilak Maharashtra Vidyapeeth" />
+</picture>
 
-<a href="https://snifexcodes.github.io/snifexcodes/"><img src="assets/enter-3d.svg" width="100%" alt="Enter the interactive 3D portfolio" /></a>
+<a href="https://snifexcodes.github.io/snifexcodes/">
+  <picture>
+    <source media="(max-width: 700px)" srcset="assets/enter-3d-m.svg" />
+    <img src="assets/enter-3d.svg" width="100%" alt="Enter the interactive 3D portfolio" />
+  </picture>
+</a>
 
-<img src="assets/title-stack.svg" width="100%" alt="Tech stack" />
+<picture>
+  <source media="(max-width: 700px)" srcset="assets/title-stack-m.svg" />
+  <img src="assets/title-stack.svg" width="100%" alt="Tech stack" />
+</picture>
 
-<img src="assets/skills.svg" width="100%" alt="HTML, CSS, JavaScript, PHP, Python, Java, MySQL, Linux, Bash, Git" />
+<picture>
+  <source media="(max-width: 700px)" srcset="assets/skills-m.svg" />
+  <img src="assets/skills.svg" width="100%" alt="HTML, CSS, JavaScript, PHP, Python, Java, MySQL, Linux, Bash, Git" />
+</picture>
 
-<img src="assets/title-projects.svg" width="100%" alt="Projects" />
+<picture>
+  <source media="(max-width: 700px)" srcset="assets/title-projects-m.svg" />
+  <img src="assets/title-projects.svg" width="100%" alt="Projects" />
+</picture>
 
-<a href="https://github.com/snifexcodes?tab=repositories"><img src="assets/project-1.svg" width="48%" alt="Paper Analyzer — scrapes TMV's DSpace repository to find repeated exam questions" /></a>
-<a href="https://github.com/snifexcodes?tab=repositories"><img src="assets/project-2.svg" width="48%" alt="AI Chat UI — chat interface with diagram rendering and multi-provider AI support" /></a>
-<a href="https://github.com/snifexcodes?tab=repositories"><img src="assets/project-3.svg" width="48%" alt="Binance MCP — MCP server and trading-bot tooling for crypto futures" /></a>
-<a href="https://github.com/snifexcodes?tab=repositories"><img src="assets/project-4.svg" width="48%" alt="Flashback Bridge — bridges CreamyKeys audio into Flashback replays" /></a>
+<a href="https://github.com/snifexcodes?tab=repositories">
+  <picture>
+    <source media="(max-width: 700px)" srcset="assets/projects-m.svg" />
+    <img src="assets/projects.svg" width="100%" alt="Projects: Paper Analyzer, AI Chat UI, Binance MCP, Flashback Bridge" />
+  </picture>
+</a>
 
-<img src="assets/title-activity.svg" width="100%" alt="3D activity" />
+<picture>
+  <source media="(max-width: 700px)" srcset="assets/title-activity-m.svg" />
+  <img src="assets/title-activity.svg" width="100%" alt="3D activity" />
+</picture>
 
 <img src="profile-3d-contrib/profile-3d-neon.svg" width="100%" alt="3D contribution calendar with stats (auto-updated)" />
 

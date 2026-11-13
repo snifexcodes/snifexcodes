@@ -168,15 +168,15 @@ STAR_CSS = ".tw{animation:tw 4s ease-in-out infinite;opacity:.25}@keyframes tw{5
 
 
 # ── HERO ─────────────────────────────────────────────────────────
-def hero():
-    W, H = 900, 400
+def hero(m=False):
+    W, H = (600, 600) if m else (900, 400)
     size = 132
-    cx, base = W / 2, 196
+    cx, base = W / 2, (236 if m else 196)
     nd = DISPLAY.d(NAME, size, cx, base, ls=10, anchor="middle")
     nw = DISPLAY.width(NAME, size, 10)
 
     # isometric floor grid
-    ox, oy = W / 2, 238
+    ox, oy = W / 2, (430 if m else 238)
     grid = []
     for i in range(-9, 10):
         a, b = iso(i * 40, -360, 0, ox, oy), iso(i * 40, 360, 0, ox, oy)
@@ -190,8 +190,10 @@ def hero():
         for i in range(layers, 0, -1))
 
     # floating cubes: (screen x, screen y, size, colour, delay)
-    cubes = [(110, 120, 34, CYAN, 0), (140, 238, 22, PINK, -1.6), (790, 110, 30, PINK, -.8),
-             (772, 236, 24, AMBER, -2.4), (70, 300, 16, VIOLET, -3.1), (840, 300, 18, CYAN, -1.1)]
+    cubes = ([(70, 64, 30, CYAN, 0), (520, 56, 26, PINK, -.8), (64, 300, 20, PINK, -1.6),
+              (540, 296, 22, AMBER, -2.4), (90, 500, 18, VIOLET, -3.1), (515, 505, 20, CYAN, -1.1)] if m else
+             [(110, 120, 34, CYAN, 0), (140, 238, 22, PINK, -1.6), (790, 110, 30, PINK, -.8),
+              (772, 236, 24, AMBER, -2.4), (70, 300, 16, VIOLET, -3.1), (840, 300, 18, CYAN, -1.1)])
     cube_svg = []
     for x, y, s, col, dl in cubes:
         cube_svg.append(
@@ -211,8 +213,14 @@ def hero():
         f'<animate attributeName="opacity" dur="{T}s" repeatCount="indefinite" calcMode="discrete" '
         f'keyTimes="0;.5" values="{vis}"/></circle>')
 
-    tag = BODY7.d(TAGLINE, 15.5, cx, 272, ls=3.2, anchor="middle")
-    sub = BODY.d(SUBLINE, 14, cx, 298, ls=.6, anchor="middle")
+    if m:
+        parts_ = [t.strip() for t in TAGLINE.split("·")]
+        lines = [parts_[0], "  ·  ".join(parts_[1:])] if len(parts_) > 1 else parts_
+        tag = " ".join(BODY7.d(l, 23, cx, 330 + i * 34, ls=3.5, anchor="middle") for i, l in enumerate(lines))
+        sub = BODY.d(SUBLINE, 19, cx, 330 + len(lines) * 34 + 12, ls=.6, anchor="middle")
+    else:
+        tag = BODY7.d(TAGLINE, 15.5, cx, 272, ls=3.2, anchor="middle")
+        sub = BODY.d(SUBLINE, 14, cx, 298, ls=.6, anchor="middle")
 
     defs = BG_DEFS + f"""
 <path id="nm" d="{nd}"/>
@@ -223,7 +231,7 @@ def hero():
  <animateTransform attributeName="gradientTransform" type="translate" values="-200 0;1100 0;1100 0" keyTimes="0;.45;1" dur="5s" repeatCount="indefinite"/></linearGradient>
 <radialGradient id="orb" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="{CYAN}"/><stop offset="1" stop-color="{VIOLET}"/></radialGradient>
 <radialGradient id="fade" cx=".5" cy=".8" r=".62"><stop offset=".25" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-<linearGradient id="vfade" x1="0" y1="0" x2="0" y2="1"><stop offset=".56" stop-color="#fff" stop-opacity="0"/><stop offset=".86" stop-color="#fff"/></linearGradient>
+<linearGradient id="vfade" x1="0" y1="0" x2="0" y2="1"><stop offset="{.7 if m else .56}" stop-color="#fff" stop-opacity="0"/><stop offset="{.92 if m else .86}" stop-color="#fff"/></linearGradient>
 <mask id="gm"><rect width="{W}" height="{H}" fill="url(#fade)"/></mask>
 <mask id="gv"><rect width="{W}" height="{H}" fill="url(#vfade)"/></mask>
 <clipPath id="card"><rect width="{W}" height="{H}" rx="22"/></clipPath>
@@ -241,8 +249,8 @@ def hero():
 <g clip-path="url(#card)">
  <rect width="{W}" height="{H}" fill="url(#bg)"/>
  <rect width="{W}" height="{H}" fill="url(#glowC)"/><rect width="{W}" height="{H}" fill="url(#glowP)"/>
- <ellipse cx="{cx}" cy="170" rx="330" ry="150" fill="url(#glowV)"/>
- {stars(70, W, H, 3, 230)}
+ <ellipse cx="{cx}" cy="{base - 26}" rx="{280 if m else 330}" ry="{170 if m else 150}" fill="url(#glowV)"/>
+ {stars(70, W, H, 3, 290 if m else 230)}
  <g mask="url(#gv)"><g mask="url(#gm)"><g class="grid" stroke="{VIOLET}" stroke-opacity=".55" stroke-width="1">{''.join(grid)}</g></g></g>
  <path d="{back}" fill="none" stroke="url(#neon)" stroke-width="2" opacity=".45"/>
  {sphere(7, "1;0")}
@@ -264,8 +272,8 @@ def hero():
 
 
 # ── SECTION TITLES ───────────────────────────────────────────────
-def title(text, file):
-    W, H = 900, 76
+def title(text, file, m=False):
+    W, H = (560, 76) if m else (900, 76)
     size, ls = 24, 7
     cx, base = W / 2, 48
     d = DISPLAY.d(text, size, cx, base, ls=ls, anchor="middle")
@@ -282,8 +290,8 @@ def title(text, file):
     cube_l = box(-7, -7, 0, 14, 14, 14, CYAN, l1 + 4, base - 6)
     cube_r = box(-7, -7, 0, 14, 14, 14, PINK, l2 - 4, base - 6)
     body = f"""
-<rect x="40" y="{base - 10}" width="{l1 - 54:.1f}" height="2" rx="1" fill="url(#lf)"/>
-<rect x="{l2 + 14:.1f}" y="{base - 10}" width="{W - 54 - l2:.1f}" height="2" rx="1" fill="url(#rf)"/>
+<rect x="{12 if m else 40}" y="{base - 10}" width="{l1 - 14 - (12 if m else 40):.1f}" height="2" rx="1" fill="url(#lf)"/>
+<rect x="{l2 + 14:.1f}" y="{base - 10}" width="{W - (12 if m else 40) - 14 - l2:.1f}" height="2" rx="1" fill="url(#rf)"/>
 <circle cx="{l1 - 14}" cy="{base - 9}" r="3" fill="{CYAN}" class="dot" style="--dx:-{l1 - 60:.0f}px"/>
 <circle cx="{l2 + 14}" cy="{base - 9}" r="3" fill="{PINK}" class="dot" style="--dx:{W - 60 - l2:.0f}px;animation-delay:-1.5s"/>
 <g class="spin">{cube_l}</g><g class="spin" style="animation-delay:-3s">{cube_r}</g>
@@ -293,38 +301,43 @@ def title(text, file):
 
 
 # ── SKILL BLOCKS ─────────────────────────────────────────────────
-def skills():
-    W, H = 900, 210
-    n = len(SKILLS)
-    s = 40
-    gap = (W - 80) / n
-    oy = 112
+def skills(m=False):
+    W = 560 if m else 900
+    per_row = 5 if m else len(SKILLS)
+    rows = [SKILLS[k:k + per_row] for k in range(0, len(SKILLS), per_row)]
+    s_ = 48 if m else 40
+    row_h = 178 if m else 0
+    H = (90 + row_h * len(rows)) if m else 210
     parts = []
-    # platform slab
-    pw = W - 60
-    parts.append(f'<rect x="30" y="{oy + 34}" width="{pw}" height="14" rx="7" fill="url(#neon)" opacity=".18"/>'
-                 f'<rect x="30" y="{oy + 30}" width="{pw}" height="6" rx="3" fill="url(#neon)" opacity=".55"/>')
-    for i, (label, col) in enumerate(SKILLS):
-        x = 40 + gap * (i + .5)
-        dl = -i * .28
-        parts.append(
-            f'<ellipse cx="{x:.1f}" cy="{oy + 33}" rx="{s * .9:.0f}" ry="5" fill="#000" opacity=".5" class="sh" style="animation-delay:{dl:.2f}s"/>'
-            f'<g class="bob" style="animation-delay:{dl:.2f}s">{box(-s / 2, -s / 2, 0, s, s, s, col, x, oy - s * .1)}'
-            f'{poly([iso(-s / 2 + 6, -s / 2 + 6, s, x, oy - s * .1), iso(-s / 2 + 18, -s / 2 + 6, s, x, oy - s * .1), iso(-s / 2 + 6, -s / 2 + 18, s, x, oy - s * .1)], "#fff", 'opacity=".35"')}</g>'
-            f'<path d="{BODY7.d(label, 13, x, oy + 68, ls=.5, anchor="middle")}" fill="#cbd5e1"/>')
-    defs = BG_DEFS + '<clipPath id="card"><rect width="900" height="210" rx="22"/></clipPath>'
+    for r, row in enumerate(rows):
+        oy = (112 if not m else 118 + r * row_h)
+        gap = (W - (40 if m else 80)) / len(row)
+        x0 = 20 if m else 40
+        pw = W - (30 if m else 60)
+        px = 15 if m else 30
+        parts.append(f'<rect x="{px}" y="{oy + 34}" width="{pw}" height="14" rx="7" fill="url(#neon)" opacity=".18"/>'
+                     f'<rect x="{px}" y="{oy + 30}" width="{pw}" height="6" rx="3" fill="url(#neon)" opacity=".55"/>')
+        for i, (label, col) in enumerate(row):
+            k = r * per_row + i
+            x = x0 + gap * (i + .5)
+            dl = -k * .28
+            by = oy - s_ * .1
+            parts.append(
+                f'<ellipse cx="{x:.1f}" cy="{oy + 33}" rx="{s_ * .9:.0f}" ry="5" fill="#000" opacity=".5" class="sh" style="animation-delay:{dl:.2f}s"/>'
+                f'<g class="bob" style="animation-delay:{dl:.2f}s">{box(-s_ / 2, -s_ / 2, 0, s_, s_, s_, col, x, by)}'
+                f'{poly([iso(-s_ / 2 + 6, -s_ / 2 + 6, s_, x, by), iso(-s_ / 2 + 18, -s_ / 2 + 6, s_, x, by), iso(-s_ / 2 + 6, -s_ / 2 + 18, s_, x, by)], "#fff", 'opacity=".35"')}</g>'
+                f'<path d="{BODY7.d(label, 16 if m else 13, x, oy + (74 if m else 68), ls=.5, anchor="middle")}" fill="#cbd5e1"/>')
+    defs = BG_DEFS + f'<clipPath id="card"><rect width="{W}" height="{H}" rx="22"/></clipPath>'
     css = STAR_CSS + """
 .bob{animation:bob 2.8s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-16px)}}
 .sh{transform-box:fill-box;transform-origin:center;animation:sh 2.8s ease-in-out infinite}@keyframes sh{50%{transform:scale(.6);opacity:.15}}"""
     body = f"""<g clip-path="url(#card)"><rect width="{W}" height="{H}" fill="url(#bg)"/>
-<rect width="{W}" height="{H}" fill="url(#glowC)"/><rect width="{W}" height="{H}" fill="url(#glowP)"/>{stars(26, W, 120, 9)}
+<rect width="{W}" height="{H}" fill="url(#glowC)"/><rect width="{W}" height="{H}" fill="url(#glowP)"/>{stars(26, W, 60 if m else 120, 9)}
 {''.join(parts)}</g>
 <rect x=".75" y=".75" width="{W - 1.5}" height="{H - 1.5}" rx="22" fill="none" stroke="url(#neon)" stroke-opacity=".4" stroke-width="1.5"/>"""
-    (ASSETS / "skills.svg").write_text(
+    (ASSETS / ("skills-m.svg" if m else "skills.svg")).write_text(
         svg(W, H, "Tech stack: " + ", ".join(l for l, _ in SKILLS), defs, css, body), encoding="utf-8")
 
-
-# ── PROJECT ICONS (iso, drawn around ox,oy) ──────────────────────
 def icon(kind, ox, oy, accent):
     if kind == "papers":
         out = ""
@@ -377,8 +390,8 @@ def icon(kind, ox, oy, accent):
     return ""
 
 
-def project(stem, kicker, ttl, desc, tags, kind, accent, idx):
-    W, H = 440, 250
+def card(stem, kicker, ttl, desc, tags, kind, accent, idx):
+    """One 440x250 project card → (defs, css, body) with ids/classes made unique by idx."""
     x0, y0, cw, ch = 10, 8, 414, 222
     lines = BODY.wrap(desc, 13.5, 236)[:4]
     text = "".join(f'<path d="{BODY.d(l, 13.5, 34, 104 + i * 20)}" fill="#a8b3c7"/>' for i, l in enumerate(lines))
@@ -388,28 +401,31 @@ def project(stem, kicker, ttl, desc, tags, kind, accent, idx):
         chips.append(f'<rect x="{cx}" y="190" width="{w:.1f}" height="22" rx="11" fill="{accent}" fill-opacity=".12" stroke="{accent}" stroke-opacity=".5"/>'
                      f'<path d="{BODY7.d(t, 11, cx + w / 2, 205, ls=.4, anchor="middle")}" fill="{shade(accent, .35)}"/>')
         cx += w + 7
-    defs = f"""
+    shared = f"""
 <linearGradient id="cb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#141a35"/><stop offset="1" stop-color="#1a1036"/></linearGradient>
 <linearGradient id="ed" x1="0" x2="1"><stop offset="0" stop-color="{CYAN}"/><stop offset=".5" stop-color="{VIOLET}"/><stop offset="1" stop-color="{PINK}"/></linearGradient>
-<radialGradient id="ig" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="{accent}" stop-opacity=".35"/><stop offset="1" stop-color="{accent}" stop-opacity="0"/></radialGradient>
-<filter id="gl" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>"""
+"""
+    defs = (shared if idx == 0 else "") + f"""<radialGradient id="ig{idx}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="{accent}" stop-opacity=".35"/><stop offset="1" stop-color="{accent}" stop-opacity="0"/></radialGradient>
+"""
+    if idx == 0:
+        defs += '<filter id="gl" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>'
     per = 2 * (cw + ch)
     css = f"""
-.card{{animation:fl 6s ease-in-out infinite;animation-delay:-{idx * 1.5}s}}@keyframes fl{{50%{{transform:translateY(-5px)}}}}
-.run{{stroke-dasharray:140 {per - 140};animation:run 6s linear infinite;animation-delay:-{idx * 1.2}s}}@keyframes run{{to{{stroke-dashoffset:-{per}}}}}
+.card{idx}{{animation:fl 6s ease-in-out infinite;animation-delay:-{idx * 1.5}s}}@keyframes fl{{50%{{transform:translateY(-5px)}}}}
+.run{idx}{{stroke-dasharray:140 {per - 140};animation:run{idx} 6s linear infinite;animation-delay:-{idx * 1.2}s}}@keyframes run{idx}{{to{{stroke-dashoffset:-{per}}}}}
 .lift{{animation:lf 3.2s ease-in-out infinite}}@keyframes lf{{50%{{transform:translateY(-7px)}}}}
 .lift2{{animation:lf 3.2s ease-in-out infinite;animation-delay:-1.6s}}
 .typing{{animation:ty 1.2s ease-in-out infinite}}@keyframes ty{{0%,100%{{opacity:.25}}40%{{opacity:1}}}}
 .wave{{animation:ty 1.2s ease-in-out infinite}}
 """
     body = f"""
-<g class="card">
+<g class="card{idx}">
  <rect x="{x0 + 6}" y="{y0 + 12}" width="{cw}" height="{ch}" rx="20" fill="#05060f"/>
  <rect x="{x0 + 3}" y="{y0 + 6}" width="{cw}" height="{ch}" rx="20" fill="{shade(accent, -.75)}"/>
  <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="20" fill="url(#cb)" stroke="#2a2f55"/>
- <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="20" fill="none" stroke="url(#ed)" stroke-width="3" class="run" filter="url(#gl)"/>
- <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="20" fill="none" stroke="url(#ed)" stroke-width="1.5" class="run"/>
- <circle cx="352" cy="104" r="78" fill="url(#ig)"/>
+ <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="20" fill="none" stroke="url(#ed)" stroke-width="3" class="run{idx}" filter="url(#gl)"/>
+ <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="20" fill="none" stroke="url(#ed)" stroke-width="1.5" class="run{idx}"/>
+ <circle cx="352" cy="104" r="78" fill="url(#ig{idx})"/>
  {icon(kind, 352, 122, accent)}
  <path d="{BODY7.d(kicker, 10.5, 34, 44, ls=1.6)}" fill="{accent}"/>
  <path d="{DISPLAY7.d(ttl, 19, 34, 74)}" fill="#f8fafc"/>
@@ -418,18 +434,33 @@ def project(stem, kicker, ttl, desc, tags, kind, accent, idx):
  <path d="{BODY7.d('VIEW', 11, 386, 205, ls=1.4, anchor='end')}" fill="#e2e8f0"/>
  {arrow(392, 201, 11, '#e2e8f0')}
 </g>"""
-    (ASSETS / f"{stem}.svg").write_text(svg(W, H, f"{ttl}: {desc}", defs, css, body), encoding="utf-8")
+    return defs, css, body
 
 
 # ── ENTER-3D BUTTON ──────────────────────────────────────────────
-def button():
-    W, H = 900, 140
-    bw, bh, depth = 520, 66, 10
+
+def projects(m=False):
+    W, H = (440, 4 * 256 + 4) if m else (900, 520)
+    defs, css, body = [], [], []
+    for i, p in enumerate(PROJECTS):
+        d, c, b = card(*p, idx=i)
+        x, y = (0, i * 256) if m else ((i % 2) * 455 + 2, (i // 2) * 262)
+        defs.append(d); css.append(c)
+        body.append(f'<g transform="translate({x} {y})">{b}</g>')
+    label = "Projects: " + "; ".join(f"{p[2]} — {p[3]}" for p in PROJECTS)
+    (ASSETS / ("projects-m.svg" if m else "projects.svg")).write_text(
+        svg(W, H, label, "".join(defs), "".join(css), "".join(body)), encoding="utf-8")
+
+def button(m=False):
+    W, H = (560, 170) if m else (900, 140)
+    bw, bh, depth = (500, 84, 12) if m else (520, 66, 10)
     bx, by = (W - bw) / 2, 26
-    label = "ENTER THE 3D PORTFOLIO"
-    ld = DISPLAY7.d(label, 17, W / 2 - 12, by + 41, ls=2.2, anchor="middle")
-    lw = DISPLAY7.width(label, 17, 2.2)
-    hint = BODY.d("drag to orbit  ·  click planets to open projects  ·  works on mobile", 12.5, W / 2, by + bh + depth + 30, ls=.6, anchor="middle")
+    label = "ENTER 3D PORTFOLIO" if m else "ENTER THE 3D PORTFOLIO"
+    fs = 22 if m else 17
+    ld = DISPLAY7.d(label, fs, W / 2 - 14, by + bh / 2 + fs * .38, ls=2.2, anchor="middle")
+    lw = DISPLAY7.width(label, fs, 2.2)
+    hint_txt = "drag  ·  orbit  ·  tap a planet" if m else "drag to orbit  ·  click planets to open projects  ·  works on mobile"
+    hint = BODY.d(hint_txt, 17 if m else 12.5, W / 2, by + bh + depth + (36 if m else 30), ls=.6, anchor="middle")
     defs = f"""
 <linearGradient id="kt" x1="0" x2="1"><stop offset="0" stop-color="{CYAN}"/><stop offset=".5" stop-color="{VIOLET}"/><stop offset="1" stop-color="{PINK}"/></linearGradient>
 <linearGradient id="ks" x1="0" x2="1"><stop offset="0" stop-color="#0e7490"/><stop offset=".5" stop-color="#4c1d95"/><stop offset="1" stop-color="#9d174d"/></linearGradient>
@@ -450,10 +481,10 @@ def button():
  <g clip-path="url(#kc)"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" fill="url(#gloss)"/><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" fill="url(#sw)"/></g>
  <path d="{ld}" fill="#0b0720" transform="translate(0 1.5)" opacity=".35"/>
  <path d="{ld}" fill="#fff"/>
- <g class="nudge">{arrow(ax, by + 35, 16, '#fff')}</g>
+ <g class="nudge">{arrow(ax, by + bh / 2 + 2, 16, '#fff')}</g>
 </g>
 <path d="{hint}" fill="#94a3b8"/>"""
-    (ASSETS / "enter-3d.svg").write_text(svg(W, H, "Enter the interactive 3D portfolio", defs, css, body), encoding="utf-8")
+    (ASSETS / ("enter-3d-m.svg" if m else "enter-3d.svg")).write_text(svg(W, H, "Enter the interactive 3D portfolio", defs, css, body), encoding="utf-8")
 
 
 # ── FOOTER ───────────────────────────────────────────────────────
@@ -487,13 +518,16 @@ def placeholder(file, w, h, msg):
 
 if __name__ == "__main__":
     ASSETS.mkdir(exist_ok=True)
-    (ASSETS / "hero.svg").write_text(hero(), encoding="utf-8")
-    for t, f in (("TECH STACK", "title-stack.svg"), ("PROJECTS", "title-projects.svg"), ("3D ACTIVITY", "title-activity.svg")):
-        title(t, f)
-    skills()
-    for i, p in enumerate(PROJECTS):
-        project(*p, idx=i)
-    button()
+    for f in ASSETS.glob("*.svg"):
+        f.unlink()
+    for m in (False, True):
+        sfx = "-m" if m else ""
+        (ASSETS / f"hero{sfx}.svg").write_text(hero(m), encoding="utf-8")
+        for t, f in (("TECH STACK", "title-stack"), ("PROJECTS", "title-projects"), ("3D ACTIVITY", "title-activity")):
+            title(t, f"{f}{sfx}.svg", m)
+        skills(m)
+        projects(m)
+        button(m)
     footer()
     pc = ROOT / "profile-3d-contrib" / "profile-3d-neon.svg"
     if not pc.exists():

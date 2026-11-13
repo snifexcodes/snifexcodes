@@ -13,7 +13,7 @@
  <animateTransform attributeName="gradientTransform" type="translate" values="-200 0;1100 0;1100 0" keyTimes="0;.45;1" dur="5s" repeatCount="indefinite"/></linearGradient>
 <radialGradient id="orb" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></radialGradient>
 <radialGradient id="fade" cx=".5" cy=".8" r=".62"><stop offset=".25" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-<linearGradient id="vfade" x1="0" y1="0" x2="0" y2="1"><stop offset=".56" stop-color="#fff" stop-opacity="0"/><stop offset=".86" stop-color="#fff"/></linearGradient>
+<linearGradient id="vfade" x1="0" y1="0" x2="0" y2="1"><stop offset="0.56" stop-color="#fff" stop-opacity="0"/><stop offset="0.86" stop-color="#fff"/></linearGradient>
 <mask id="gm"><rect width="900" height="400" fill="url(#fade)"/></mask>
 <mask id="gv"><rect width="900" height="400" fill="url(#vfade)"/></mask>
 <clipPath id="card"><rect width="900" height="400" rx="22"/></clipPath>
