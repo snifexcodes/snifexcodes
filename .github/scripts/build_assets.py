@@ -47,6 +47,15 @@ PROJECTS = [  # file stem, kicker, title, description, tags, icon, accent
      "Mod patch that bridges CreamyKeys audio into Flashback replays and exports.",
      ["Java", "Modding"], "bridge", "#fbbf24"),
 ]
+FEATURED = dict(
+    kicker="FEATURED  ·  PYTHON  ·  COMPUTER VISION",
+    title="Mudra",
+    subtitle="Real-time sign language to text",
+    desc="Watches your hand through a webcam and turns signs into live captions in the browser. "
+         "Teach it new signs, and it trains and compares four ML models on your recordings.",
+    tags=["Python", "Flask", "MediaPipe", "scikit-learn"],
+    sign="HELLO", conf="97%", accent="#34d399",
+)
 # ──────────────────────────────────────────────────────────────────
 
 CYAN, VIOLET, PINK, AMBER = "#22d3ee", "#8b5cf6", "#ec4899", "#fbbf24"
@@ -437,6 +446,124 @@ def card(stem, kicker, ttl, desc, tags, kind, accent, idx):
     return defs, css, body
 
 
+# ── FEATURED PROJECT (hand-tracking card) ───────────────────────
+HAND = {  # open-palm landmarks, wrist at origin, y up = negative
+    0: (0, 0), 1: (-30, -20), 2: (-52, -45), 3: (-68, -68), 4: (-80, -90),
+    5: (-20, -72), 6: (-24, -106), 7: (-26, -129), 8: (-28, -150),
+    9: (0, -76), 10: (1, -114), 11: (2, -139), 12: (3, -161),
+    13: (19, -71), 14: (23, -105), 15: (26, -127), 16: (28, -146),
+    17: (35, -61), 18: (43, -87), 19: (48, -105), 20: (52, -122),
+}
+BONES = [(0, 1), (1, 2), (2, 3), (3, 4), (0, 5), (5, 6), (6, 7), (7, 8), (5, 9), (9, 10), (10, 11), (11, 12),
+         (9, 13), (13, 14), (14, 15), (15, 16), (13, 17), (0, 17), (17, 18), (18, 19), (19, 20)]
+TIPS = (4, 8, 12, 16, 20)
+
+
+def hand(ox, oy, sc):
+    P = {k: (ox + x * sc, oy + y * sc) for k, (x, y) in HAND.items()}
+    bones = "".join(f'<line x1="{P[a][0]:.1f}" y1="{P[a][1]:.1f}" x2="{P[b][0]:.1f}" y2="{P[b][1]:.1f}"/>' for a, b in BONES)
+    joints = "".join(f'<circle cx="{P[k][0]:.1f}" cy="{P[k][1]:.1f}" r="{4 * sc:.1f}"/>' for k in P if k not in TIPS)
+    tips = "".join(f'<circle cx="{P[k][0]:.1f}" cy="{P[k][1]:.1f}" r="{6 * sc:.1f}"/>' for k in TIPS)
+    pings = "".join(f'<circle cx="{P[k][0]:.1f}" cy="{P[k][1]:.1f}" r="{6 * sc:.1f}" class="ping" style="animation-delay:{i * .3:.1f}s"/>'
+                    for i, k in enumerate(TIPS))
+    origin = f"transform-origin:{ox:.1f}px {oy:.1f}px"
+    trail = lambda d, o: f'<g class="sway" style="{origin};animation-delay:{d}s" opacity="{o}" fill="{PINK}">{tips}</g>'
+    return (f'<ellipse cx="{ox}" cy="{oy - 80 * sc:.1f}" rx="{110 * sc:.0f}" ry="{120 * sc:.0f}" fill="url(#hg)"/>'
+            + trail(-.36, .12) + trail(-.24, .2) + trail(-.12, .32)
+            + f'<g class="sway" style="{origin}">'
+              f'<g stroke="url(#bone)" stroke-width="{3.2 * sc:.1f}" stroke-linecap="round">{bones}</g>'
+              f'<g fill="#e0f2fe">{joints}</g><g fill="{PINK}" filter="url(#tipglow)">{tips}</g>'
+              f'<g fill="none" stroke="{PINK}">{pings}</g></g>')
+
+
+def featured(m=False):
+    F = FEATURED
+    acc = F["accent"]
+    if m:
+        W, H = 440, 540
+        x0, y0, cw, ch = 10, 8, 414, 512
+        hx, hy, hs = 205, 236, .9
+        bx, by = 262, 52
+        tx, ty, tw = 34, 296, 360
+    else:
+        W, H = 900, 300
+        x0, y0, cw, ch = 10, 8, 874, 272
+        hx, hy, hs = 720, 254, 1.0
+        bx, by = 772, 44
+        tx, ty, tw = 40, 52, 470
+    k_y, t_y, s_y = ty, ty + (46 if m else 50), ty + (76 if m else 82)
+    d_y = s_y + 32
+    lines = BODY.wrap(F["desc"], 14, tw)[:4]
+    desc = "".join(f'<path d="{BODY.d(l, 14, tx, d_y + i * 21)}" fill="#a8b3c7"/>' for i, l in enumerate(lines))
+    chip_y = d_y + len(lines) * 21 + 12
+    chips, cx = [], tx
+    for t in F["tags"]:
+        w = BODY7.width(t, 11.5, .4) + 20
+        chips.append(f'<rect x="{cx:.1f}" y="{chip_y}" width="{w:.1f}" height="24" rx="12" fill="{acc}" fill-opacity=".12" stroke="{acc}" stroke-opacity=".5"/>'
+                     f'<path d="{BODY7.d(t, 11.5, cx + w / 2, chip_y + 16, ls=.4, anchor="middle")}" fill="{shade(acc, .4)}"/>')
+        cx += w + 7
+    if m:  # grow the card to fit the text, put VIEW REPO under the chips
+        view_x, view_y = x0 + cw - 6, chip_y + 58
+        ch = view_y + 26 - y0
+        H = y0 + ch + 18
+    else:
+        view_x, view_y = tx + tw + 30, chip_y + 16
+    # sign bubble with a hold-to-add ring
+    bw_ = BODY7.width(F["sign"], 16, 1.5) + 92
+    bx = min(bx, x0 + cw - bw_ - 22)
+    bubble = (f'<g class="pop">'
+              f'<rect x="{bx}" y="{by}" width="{bw_:.0f}" height="44" rx="22" fill="#0b1224" fill-opacity=".85" stroke="{acc}" stroke-opacity=".6"/>'
+              f'<circle cx="{bx + 22}" cy="{by + 22}" r="11" fill="none" stroke="#1f2a44" stroke-width="3.5"/>'
+              f'<circle cx="{bx + 22}" cy="{by + 22}" r="11" fill="none" stroke="{acc}" stroke-width="3.5" stroke-linecap="round" '
+              f'pathLength="1" class="hold" transform="rotate(-90 {bx + 22} {by + 22})"/>'
+              f'<path d="{BODY7.d(F["sign"], 16, bx + 42, by + 28, ls=1.5)}" fill="#f8fafc"/>'
+              f'<path d="{BODY.d(F["conf"], 12, bx + bw_ - 14, by + 27, anchor="end")}" fill="{acc}"/></g>')
+    per = 2 * (cw + ch)
+    defs = f"""
+<linearGradient id="fcb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f1d2e"/><stop offset=".55" stop-color="#141a35"/><stop offset="1" stop-color="#1a1036"/></linearGradient>
+<linearGradient id="fed" x1="0" x2="1"><stop offset="0" stop-color="{acc}"/><stop offset=".5" stop-color="{CYAN}"/><stop offset="1" stop-color="{VIOLET}"/></linearGradient>
+<linearGradient id="bone" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="{CYAN}"/><stop offset="1" stop-color="{VIOLET}"/></linearGradient>
+<radialGradient id="hg" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="{acc}" stop-opacity=".22"/><stop offset="1" stop-color="{acc}" stop-opacity="0"/></radialGradient>
+<filter id="tipglow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="fgl" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>
+<pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#fff" opacity=".05"/></pattern>"""
+    css = f"""
+.card{{animation:fl 6s ease-in-out infinite}}@keyframes fl{{50%{{transform:translateY(-5px)}}}}
+.run{{stroke-dasharray:180 {per - 180};animation:run 7s linear infinite}}@keyframes run{{to{{stroke-dashoffset:-{per}}}}}
+.sway{{animation:sw 4s ease-in-out infinite}}@keyframes sw{{0%,100%{{transform:rotate(-5deg)}}50%{{transform:rotate(5deg)}}}}
+.ping{{transform-box:fill-box;transform-origin:center;opacity:0;animation:pg 2s ease-out infinite}}@keyframes pg{{0%{{opacity:.9;transform:scale(1)}}100%{{opacity:0;transform:scale(2.8)}}}}
+.hold{{stroke-dasharray:1;stroke-dashoffset:1;animation:hd 2.4s ease-in-out infinite}}@keyframes hd{{0%{{stroke-dashoffset:1}}70%,100%{{stroke-dashoffset:0}}}}
+.pop{{animation:po 2.4s ease-in-out infinite}}@keyframes po{{0%,70%{{transform:none}}80%{{transform:translateY(-3px)}}100%{{transform:none}}}}
+.live{{animation:lv 1.4s ease-in-out infinite}}@keyframes lv{{50%{{opacity:.3}}}}"""
+    live_txt = "LIVE  ·  21 LANDMARKS"
+    if m:
+        rec_x, rec_y = x0 + 26, y0 + 34
+    else:
+        rec_x, rec_y = 560, y0 + 34
+    body = f"""
+<g class="card">
+ <rect x="{x0 + 6}" y="{y0 + 12}" width="{cw}" height="{ch}" rx="22" fill="#05060f"/>
+ <rect x="{x0 + 3}" y="{y0 + 6}" width="{cw}" height="{ch}" rx="22" fill="{shade(acc, -.75)}"/>
+ <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="22" fill="url(#fcb)" stroke="#24304f"/>
+ <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="22" fill="url(#dots)"/>
+ <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="22" fill="none" stroke="url(#fed)" stroke-width="3" class="run" filter="url(#fgl)"/>
+ <rect x="{x0}" y="{y0}" width="{cw}" height="{ch}" rx="22" fill="none" stroke="url(#fed)" stroke-width="1.6" class="run"/>
+ {hand(hx, hy, hs)}
+ {bubble}
+ <circle cx="{rec_x:.1f}" cy="{rec_y}" r="4" fill="#ef4444" class="live"/>
+ <path d="{BODY7.d(live_txt, 10, rec_x + 10, rec_y + 4, ls=1.2)}" fill="#64748b"/>
+ <path d="{BODY7.d(F['kicker'], 11, tx, k_y, ls=1.8)}" fill="{acc}"/>
+ <path d="{DISPLAY.d(F['title'], 40 if not m else 36, tx, t_y, ls=1)}" fill="#f8fafc"/>
+ <path d="{BODY7.d(F['subtitle'], 17, tx, s_y, ls=.3)}" fill="#e2e8f0"/>
+ {desc}
+ {''.join(chips)}
+ <path d="{BODY7.d('VIEW REPO', 11.5, view_x - 18, view_y, ls=1.4, anchor='end')}" fill="#e2e8f0"/>
+ {arrow(view_x - 12, view_y - 4, 11, '#e2e8f0')}
+</g>"""
+    (ASSETS / ("featured-m.svg" if m else "featured.svg")).write_text(
+        svg(W, H, f"Featured project — {F['title']}: {F['subtitle']}. {F['desc']}", defs, css, body), encoding="utf-8")
+
+
 # ── ENTER-3D BUTTON ──────────────────────────────────────────────
 
 def projects(m=False):
@@ -526,6 +653,7 @@ if __name__ == "__main__":
         for t, f in (("TECH STACK", "title-stack"), ("PROJECTS", "title-projects"), ("3D ACTIVITY", "title-activity")):
             title(t, f"{f}{sfx}.svg", m)
         skills(m)
+        featured(m)
         projects(m)
         button(m)
     footer()

@@ -11,6 +11,9 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 // ───────────── content (edit me) ─────────────
 const GH = 'https://github.com/snifexcodes';
 const PROJECTS = [
+  { kicker: 'Featured · Python · Computer vision', title: 'Mudra', color: '#34d399', radius: 6.8, size: 1.15, speed: 0.3, ring: true,
+    desc: 'Real-time sign language to text. Watches your hand through a webcam, turns signs into live captions, and trains and compares four ML models on your recordings.',
+    tags: ['Python', 'Flask', 'MediaPipe', 'scikit-learn'], url: 'https://github.com/snifexcodes/Mudra' },
   { kicker: 'Python · Scraper', title: 'Paper Analyzer', color: '#22d3ee', radius: 9, size: 1.25, speed: 0.22,
     desc: "Scrapes TMV's DSpace repository and finds exam questions that repeat across years, then builds a PDF report.",
     tags: ['Python', 'Scraping', 'PDF'], url: `${GH}?tab=repositories` },

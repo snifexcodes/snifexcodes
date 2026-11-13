@@ -27,6 +27,13 @@
   <img src="assets/title-projects.svg" width="100%" alt="Projects" />
 </picture>
 
+<a href="https://github.com/snifexcodes/Mudra">
+  <picture>
+    <source media="(max-width: 700px)" srcset="assets/featured-m.svg" />
+    <img src="assets/featured.svg" width="100%" alt="Featured: Mudra — real-time sign language to text (Python, Flask, MediaPipe, scikit-learn)" />
+  </picture>
+</a>
+
 <a href="https://github.com/snifexcodes?tab=repositories">
   <picture>
     <source media="(max-width: 700px)" srcset="assets/projects-m.svg" />
