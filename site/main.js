@@ -190,6 +190,7 @@ core.add(coreGlow);
 // name label on the core
 const nameEl = document.createElement('div');
 nameEl.className = 'core-label';
+nameEl.translate = false;
 nameEl.innerHTML = '<b>RAJ</b><span>click a planet</span>';
 const nameObj = new CSS2DObject(nameEl);
 nameObj.position.set(0, -5.6, 0);
