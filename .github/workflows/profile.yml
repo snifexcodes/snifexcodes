@@ -1,0 +1,40 @@
+name: profile
+
+# Fills in your username and regenerates the 3D contribution skyline.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 */12 * * *"   # twice a day
+  workflow_dispatch:           # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Fill in username
+        run: sed -i "s/YOUR_USERNAME/${GITHUB_REPOSITORY_OWNER}/g" README.md docs/index.html  # no-op once filled in
+
+      - name: 3D contribution skyline
+        uses: yoshi389111/github-profile-3d-contrib@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+          SETTING_JSON: .github/profile-3d.json
+
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs profile-3d-contrib
+          git diff --cached --quiet || git commit -m "chore: refresh 3D profile [skip ci]"
+          git push

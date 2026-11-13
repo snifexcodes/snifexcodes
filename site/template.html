@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Raj — 3D Portfolio</title>
+<meta name="description" content="Raj — full-stack developer, automation tinkerer and Linux enthusiast. An interactive 3D portfolio.">
+<meta name="theme-color" content="#04050d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x2='1' y2='1'%3E%3Cstop stop-color='%2322d3ee'/%3E%3Cstop offset='.5' stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 4l24 14v28L32 60 8 46V18z' fill='url(%23g)'/%3E%3C/svg%3E">
+<style>
+@font-face{font-family:Unbounded;font-weight:700;font-display:swap;src:url(data:font/woff2;base64,__UNBOUNDED__) format('woff2')}
+@font-face{font-family:'Space Grotesk';font-weight:500;font-display:swap;src:url(data:font/woff2;base64,__GROTESK__) format('woff2')}
+:root{--cyan:#22d3ee;--violet:#8b5cf6;--pink:#ec4899;--ink:#e9e7ff;--mute:#9aa3c0;--glass:rgba(16,14,38,.55);--edge:rgba(167,139,250,.25)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#04050d;color:var(--ink);font-family:'Space Grotesk',system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage,#stage canvas,.labels{position:fixed;inset:0}
+.labels{touch-action:none}
+a{color:inherit}
+.ui{position:fixed;z-index:5;pointer-events:none;opacity:0;transform:translateY(10px);transition:opacity 1s .9s,transform 1s .9s}
+.ready .ui{opacity:1;transform:none}
+.ui *{pointer-events:auto}
+
+.brand{top:clamp(16px,4vh,40px);left:clamp(16px,4vw,48px);max-width:min(440px,80vw)}
+.logo{font:700 clamp(40px,7vw,76px)/.95 Unbounded,sans-serif;letter-spacing:.04em;background:linear-gradient(100deg,var(--cyan),#c4b5fd 50%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 24px rgba(139,92,246,.45));pointer-events:none}
+.tag{margin-top:10px;font-weight:500;letter-spacing:.2em;font-size:clamp(10px,1.1vw,12.5px);text-transform:uppercase;color:#ddd6fe;pointer-events:none}
+.sub{margin-top:4px;color:var(--mute);font-size:13px;pointer-events:none}
+#skills{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+#skills span{font-size:11.5px;padding:4px 9px;border-radius:99px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 12%,transparent);color:color-mix(in srgb,var(--c) 45%,#fff)}
+
+.top{top:clamp(16px,4vh,40px);right:clamp(16px,4vw,48px);display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;text-decoration:none;font-weight:500;font-size:14px;background:var(--glass);border:1px solid var(--edge);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.6)}
+.btn svg{width:18px;height:18px}
+
+#dock{pointer-events:auto;left:50%;bottom:clamp(16px,4vh,36px);transform:translateX(-50%);display:flex;gap:8px;padding:8px;border-radius:18px;background:var(--glass);border:1px solid var(--edge);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);max-width:calc(100vw - 24px);overflow-x:auto;scrollbar-width:none}
+.ready #dock{transform:translateX(-50%)}
+#dock button{all:unset;pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;padding:9px 14px;border-radius:12px;font-size:13.5px;font-weight:500;color:#d6d3f0;transition:background .25s,color .25s}
+#dock button i,.planet-label i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 12px var(--c)}
+#dock button:hover,#dock button.on{background:color-mix(in srgb,var(--c) 18%,transparent);color:#fff}
+
+.hint{left:clamp(16px,4vw,48px);bottom:clamp(20px,4.5vh,42px);font-size:12px;color:var(--mute);letter-spacing:.06em;pointer-events:none}
+
+.planet-label{all:unset;cursor:pointer;display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:99px;font:500 12.5px 'Space Grotesk',sans-serif;color:#e9e7ff;background:rgba(8,8,24,.55);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:transform .25s,background .25s;white-space:nowrap}
+.planet-label.hot{transform:scale(1.1);background:color-mix(in srgb,var(--c) 30%,rgba(8,8,24,.6))}
+.core-label{text-align:center;pointer-events:none}
+.core-label b{display:block;font:700 15px Unbounded,sans-serif;letter-spacing:.35em;color:#f5f3ff;text-shadow:0 0 18px rgba(167,139,250,.9)}
+.core-label span{font-size:11px;color:var(--mute);letter-spacing:.2em;text-transform:uppercase}
+
+#panel{position:fixed;z-index:6;top:50%;right:clamp(16px,4vw,48px);width:min(380px,calc(100vw - 32px));transform:translate(30px,-50%);opacity:0;pointer-events:none;transition:opacity .45s,transform .45s cubic-bezier(.2,.8,.2,1);padding:26px;border-radius:22px;background:linear-gradient(160deg,rgba(26,20,60,.78),rgba(10,10,28,.72));border:1px solid var(--edge);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08)}
+#panel.open{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+#panel::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(130deg,var(--cyan),var(--violet),var(--pink));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.7;pointer-events:none}
+#p-kicker{font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase}
+#p-title{font:700 26px/1.15 Unbounded,sans-serif;margin:10px 0 12px}
+#p-desc{color:#bcc3dc;line-height:1.6;font-size:15px}
+#p-tags{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 22px}
+#p-tags span{font-size:12px;padding:4px 10px;border-radius:99px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);color:color-mix(in srgb,var(--c) 40%,#fff);background:color-mix(in srgb,var(--c) 12%,transparent)}
+#p-link{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;font-weight:500;text-decoration:none;color:#0b0820;background:var(--c);box-shadow:0 10px 30px color-mix(in srgb,var(--c) 45%,transparent);transition:transform .2s}
+#p-link:hover{transform:translateY(-2px)}
+#p-close{all:unset;cursor:pointer;position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--mute);background:rgba(255,255,255,.05)}
+#p-close:hover{color:#fff;background:rgba(255,255,255,.1)}
+
+#tip{position:fixed;left:0;top:0;z-index:7;pointer-events:none;padding:6px 10px;border-radius:9px;font-size:12.5px;background:rgba(10,10,28,.85);border:1px solid var(--edge);opacity:0;transition:opacity .15s;white-space:nowrap}
+#tip.show{opacity:1}
+
+#loader{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:#04050d;transition:opacity 1.2s .2s,visibility 0s 1.4s;text-align:center;color:var(--mute)}
+#loader.done{opacity:0;visibility:hidden}
+#loader .ring{width:54px;height:54px;border-radius:50%;border:2px solid rgba(139,92,246,.2);border-top-color:var(--cyan);animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media (max-width:760px){
+ .hint,#skills{display:none}
+ #panel{top:auto;bottom:86px;right:50%;transform:translate(50%,30px)}
+ #panel.open{transform:translate(50%,0)}
+ #p-title{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+
+<header class="ui brand">
+  <div class="logo">RAJ</div>
+  <div class="tag">Full-stack developer · Automation · Linux</div>
+  <div class="sub">BCA @ Tilak Maharashtra Vidyapeeth</div>
+  <div id="skills"></div>
+</header>
+
+<nav class="ui top">
+  <a class="btn" href="https://github.com/snifexcodes" target="_blank" rel="noopener">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    GitHub
+  </a>
+</nav>
+
+<div class="ui hint">drag to orbit · scroll to zoom · click a planet · ← → to cycle</div>
+<nav class="ui" id="dock" aria-label="Projects"></nav>
+
+<aside id="panel" aria-live="polite">
+  <button id="p-close" aria-label="Close">✕</button>
+  <div id="p-kicker"></div>
+  <h2 id="p-title"></h2>
+  <p id="p-desc"></p>
+  <div id="p-tags"></div>
+  <a id="p-link" href="#" target="_blank" rel="noopener">View on GitHub
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12L12 4M6 4h6v6"/></svg></a>
+</aside>
+
+<div id="tip"></div>
+<div id="loader"><div><div class="ring"></div>loading universe…</div></div>
+
+<script>__BUNDLE__</script>
+</body>
+</html>
